@@ -1,22 +1,30 @@
 package com.github.composeplay
 
 import PageIndicator
-import PageIndicatorContent
 import PagerUiScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntOffsetAsState
+import androidx.compose.animation.core.animateIntSizeAsState
+import androidx.compose.animation.core.animateOffsetAsState
+import androidx.compose.animation.core.animateSizeAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,47 +32,40 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.TabRowDefaults.Indicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.boundsInParent
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import com.github.composeplay.ui.theme.ComposePlayTheme
-import kotlinx.coroutines.delay
+import images
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,9 +80,7 @@ class MainActivity : ComponentActivity() {
                                 .fillMaxSize()
                                 .background(Color.Black),
                         ) {
-//                            TryNewApp()
-                            SwapShapes()
-//                            CarousalDemo()
+                            CarousalDemo()
                         }
                     }
                 }
@@ -105,10 +104,22 @@ private fun CarousalDemo() {
         ) {
 
             val pagerState = rememberPagerState() {
-                10
+                images.size
             }
             val scope = rememberCoroutineScope()
 
+            var i = 0
+            var state = true
+//            LaunchedEffect(key1 = true) {
+//                while (state) {
+//                    delay(2000L)
+//                    pagerState.animateScrollToPage(i)
+//                    if (i == images.size)
+//                        state = false
+//                    else i += 1
+//                }
+//
+//            }
             HorizontalPager(
                 state = pagerState,
                 contentPadding = PaddingValues(horizontal = 32.dp),
@@ -130,131 +141,71 @@ private fun CarousalDemo() {
             PageIndicator(
                 modifier = Modifier
                     .padding(4.dp)
-                    .align(Alignment.BottomCenter), pagerState = pagerState
+                    .align(Alignment.BottomCenter),
+                pagerState = pagerState
             )
         }
     }
 }
 
-
-@Composable
-fun SwapShapes() {
-    var swapped by remember { mutableStateOf(false) }
-
-    val size = 20.dp
-    val initialOffset = 0.dp
-    val swappedOffset = 40.dp
-
-    val offsetLeft = animateDpAsState(targetValue = if (swapped) swappedOffset else initialOffset)
-    val offsetRight = animateDpAsState(targetValue = if (swapped) initialOffset else swappedOffset)
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        Box(
-            modifier = Modifier
-                .offset(x = offsetLeft.value.times(1.5f))
-                .size(size)
-                .background(Color.Red, CircleShape)
-                .clickable { swapped = !swapped }
-        )
-        Box(
-            modifier = Modifier
-                .offset(x = offsetRight.value)
-                .size(width = size.times(2), height = size)
-                .background(Color.White, CircleShape)
-                .clickable { swapped = !swapped }
-        )
-    }
-    PageIndicatorContent(
-        modifier = Modifier,
-        numberOfPages = 4,
-        selectedPage = 0,
-        defaultRadius = 20.dp,
-        selectedLength = 40.dp,
-        space = 4.dp,
-        animationDurationInMillis = 500,
-    )
-    Row {
-        LaunchedEffect(key1 = true) {
-
-        }
-        for (i in 0 until 4) {
-            Indicator(
-                selected = false,
-                shift = false,
-                shiftPosition = 50.dp,
-                spacing = 10.dp,
-                width = 30.dp,
-                height = 30.dp
-            )
-        }
-    }
-}
 
 @Composable
 fun Indicator(
-    selected: Boolean, shift: Boolean, shiftPosition: Dp,
+    selected: Boolean,
+    selecting: Boolean,
+    index: Int,
+    selectedColor: Color,
+    defaultColor: Color,
+    lastColor: Color,
     spacing: Dp,
     width: Dp,
     height: Dp
 ) {
+    val capsule: Dp by animateDpAsState(
+        targetValue = if (selected) {
+            width.times(2)
+        } else {
+            width
+        },
+        animationSpec = tween(
+            durationMillis = 500,
+        )
+    )
+//    val offset by animateIntOffsetAsState(
+//        targetValue = if (selected) {
+//            IntOffset(60, 0)
+//        } else {
+//            IntOffset.Zero
+//        },
+//        label = "offset"
+//    )
+
+    val size by animateIntSizeAsState(
+        targetValue = if (selected) {
+            IntSize(width.times(2).value.toInt(), height.value.toInt())
+        } else {
+            IntSize(width.times(1).value.toInt(), height.value.toInt())
+        },
+        label = "offset"
+    )
+    val bg: Color by animateColorAsState(
+        targetValue = if (selected) {
+            Color.Red
+        } else {
+            Color.White
+        },
+        animationSpec = tween(
+            durationMillis = 100,
+        )
+    )
+
     Box(
         modifier = Modifier
             .padding(horizontal = spacing)
-            .size(width = if (selected) width.times(2) else width, height = height)
-            .background(Color.White, CircleShape)
-            .then(if (shift) Modifier.offset(x = shiftPosition) else Modifier)
+            .size(width = capsule, height = height)
+            .background(
+                bg, CircleShape
+            )
     )
 }
 
-@Composable
-internal fun TryNewApp() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Black.copy(alpha = 0.25f))
-            .padding(40.dp)
-    ) {
-
-        val isSelected = remember {
-            mutableStateOf(false)
-        }
-        val right: Dp by animateDpAsState(
-            targetValue = if (isSelected.value) {
-                100.dp
-            } else {
-                0.dp
-            },
-            animationSpec = tween(
-                durationMillis = 600,
-            )
-        )
-        val left: Dp by animateDpAsState(
-            targetValue = if (isSelected.value) {
-                0.dp
-            } else {
-                100.dp
-            },
-            animationSpec = tween(
-                durationMillis = 601,
-            )
-        )
-
-        LaunchedEffect(key1 = true) {
-            delay(2000L)
-            isSelected.value = true
-        }
-
-        Box(
-            modifier = Modifier
-                .size(30.dp)
-                .offset(right, 0.dp)
-                .background(Color.Green, shape = CircleShape)
-        )
-        Box(
-            modifier = Modifier
-                .size(width = 60.dp, height = 30.dp)
-                .offset(left, 0.dp)
-                .background(Color.Green, shape = CircleShape)
-        )
-    }
-}
