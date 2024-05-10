@@ -3,6 +3,7 @@ package com.github.composeplay
 import PageIndicator
 import PagerUiScreen
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -19,6 +20,9 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,9 +58,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -66,6 +75,8 @@ import androidx.compose.ui.unit.times
 import com.github.composeplay.ui.theme.ComposePlayTheme
 import images
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,12 +91,98 @@ class MainActivity : ComponentActivity() {
                                 .fillMaxSize()
                                 .background(Color.Black),
                         ) {
-                            CarousalDemo()
+//                            CarousalDemo()
+                            App()
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun App() {
+    Row(
+        modifier = Modifier
+            .padding(10.dp)
+//            .border(1.dp, Color.White)
+    ) {
+        var moved by remember { mutableStateOf(false) }
+        val defaultWidth = 33.dp
+        val capsuleWidth = defaultWidth.times(2)
+        val padding = defaultWidth.div(2)
+        val paddingPx = with(LocalDensity.current) {
+            padding.toPx()
+        }
+        val pxToMoveLeft = with(LocalDensity.current) {
+            defaultWidth.toPx().plus(paddingPx.times(2)).roundToInt()
+        }
+        val pxToMoveRight = with(LocalDensity.current) {
+            paddingPx.times(2).minus(pxToMoveLeft + capsuleWidth.toPx()).roundToInt()
+        }
+        val offsetLeft by animateIntOffsetAsState(
+            targetValue = if (moved) {
+                IntOffset(pxToMoveLeft, 0)
+            } else {
+                IntOffset.Zero
+            },
+            label = "offset"
+        )
+        val offsetRight by animateIntOffsetAsState(
+            targetValue = if (moved) {
+                IntOffset(pxToMoveRight, 0)
+            } else {
+                IntOffset.Zero
+            },
+            label = "offset"
+        )
+        Box(
+            modifier = Modifier
+                .padding(horizontal = padding)
+                .offset {
+                    offsetLeft
+                }
+                .background(Color.White, CircleShape)
+                .size(width = capsuleWidth, height = defaultWidth)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+                    moved = !moved
+                }
+        )
+        Box(
+            modifier = Modifier
+                .padding(horizontal = padding)
+                .offset {
+                    offsetRight
+                }
+                .background(Color.Red, CircleShape)
+                .size(defaultWidth)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+                    moved = !moved
+                }
+        )
+
+        Box(
+            modifier = Modifier
+                .padding(horizontal = padding)
+//                .offset {
+//                    -offset.div(2.4f)
+//                }
+                .background(Color.Green, CircleShape)
+                .size(defaultWidth)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+                    moved = !moved
+                }
+        )
     }
 }
 
@@ -168,26 +265,10 @@ fun Indicator(
             width
         },
         animationSpec = tween(
-            durationMillis = 500,
+            durationMillis = 100,
         )
     )
-//    val offset by animateIntOffsetAsState(
-//        targetValue = if (selected) {
-//            IntOffset(60, 0)
-//        } else {
-//            IntOffset.Zero
-//        },
-//        label = "offset"
-//    )
 
-    val size by animateIntSizeAsState(
-        targetValue = if (selected) {
-            IntSize(width.times(2).value.toInt(), height.value.toInt())
-        } else {
-            IntSize(width.times(1).value.toInt(), height.value.toInt())
-        },
-        label = "offset"
-    )
     val bg: Color by animateColorAsState(
         targetValue = if (selected) {
             Color.Red
