@@ -28,13 +28,16 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -49,6 +52,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.github.composeplay.ui.theme.ComposePlayTheme
 import images
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -65,13 +69,49 @@ class MainActivity : ComponentActivity() {
                                 .fillMaxSize()
                                 .background(Color.Black),
                         ) {
-//                            CarousalDemo()
-                            App()
+//                            MediaCarousal()
+                            CarouselApp(
+                                list = images.toMutableList()
+                            )
+//                            App()
+//                            SwapBox()
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun SwapBox() {
+    val size = 32.dp
+    Row(
+        modifier = Modifier
+            .padding(10.dp)
+//            .border(1.dp, Color.White)
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .background(Color.White, CircleShape)
+                .size(size)
+        )
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .background(Color.White, CircleShape)
+                .size(size)
+        )
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .background(Color.White, CircleShape)
+                .size(size)
+        )
+    }
+    Button(onClick = { /*TODO*/ }) {
+        Text(text = "Swap one and two using offset")
     }
 }
 
@@ -138,7 +178,7 @@ fun App() {
             modifier = Modifier
                 .padding(horizontal = padding)
                 .offset {
-                    if(twoToThree) offsetRight1 else offsetLeft
+                    if (twoToThree) offsetRight1 else offsetLeft
                 }
                 .background(Color.White, CircleShape)
                 .size(width = capsuleWidth, height = defaultWidth)
@@ -146,8 +186,8 @@ fun App() {
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {
-                    if(oneToTwo&&twoToThree){
-                        twoToThree=!twoToThree
+                    if (oneToTwo && twoToThree) {
+                        twoToThree = !twoToThree
                     }
                     oneToTwo = !oneToTwo
                 }
@@ -186,62 +226,67 @@ fun App() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CarousalDemo() {
+private fun MediaCarousal() {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(stringResource(R.string.app_name)) })
         }, modifier = Modifier.fillMaxSize()
     ) { padding ->
-        Box(
-            Modifier
-                .padding(padding),
-            contentAlignment = Alignment.Center
-        ) {
+        Carousal(modifier = Modifier.padding(padding), autoStart = true)
+    }
+}
 
-            val pagerState = rememberPagerState() {
-                images.size
-            }
-            val scope = rememberCoroutineScope()
+@Composable
+private fun Carousal(modifier: Modifier, autoStart: Boolean, autoScrollDuration: Long = 1000L) {
+    Box(
+        modifier,
+        contentAlignment = Alignment.Center
+    ) {
 
-            var i = 0
-            var state = true
-//            LaunchedEffect(key1 = true) {
-//                while (state) {
-//                    delay(2000L)
-//                    pagerState.animateScrollToPage(i)
-//                    if (i == images.size)
-//                        state = false
-//                    else i += 1
-//                }
-//
-//            }
-            HorizontalPager(
-                state = pagerState,
-                contentPadding = PaddingValues(horizontal = 32.dp),
-                pageSpacing = 8.dp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            ) { pageCount ->
-                PagerUiScreen(
-                    page = pageCount,
-                    modifier = Modifier
-                        .aspectRatio(2.2f),
-                ) {
-                    scope.launch {
-                        pagerState.animateScrollToPage(it)
+        val pagerState = rememberPagerState() {
+            images.size
+        }
+        val scope = rememberCoroutineScope()
+
+        if (autoStart) {
+            var currentPageKey by remember { mutableIntStateOf(0) }
+            with(pagerState){
+                LaunchedEffect(key1 = currentPageKey) {
+                    launch {
+                        delay(timeMillis = autoScrollDuration)
+                        val nextPage = (currentPage + 1).mod(pageCount)
+                        animateScrollToPage(nextPage)
+                        currentPageKey = nextPage
                     }
                 }
             }
-            PageIndicator(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .align(Alignment.BottomCenter),
-                pagerState = pagerState
-            )
         }
+        HorizontalPager(
+            state = pagerState,
+            contentPadding = PaddingValues(horizontal = 32.dp),
+            pageSpacing = 8.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        ) { pageCount ->
+            PagerUiScreen(
+                page = pageCount,
+                modifier = Modifier
+                    .aspectRatio(2.2f),
+            ) {
+                scope.launch {
+                    pagerState.animateScrollToPage(it)
+                }
+            }
+        }
+        PageIndicator(
+            modifier = Modifier
+                .padding(4.dp)
+                .align(Alignment.BottomCenter),
+            pagerState = pagerState
+        )
     }
 }
 

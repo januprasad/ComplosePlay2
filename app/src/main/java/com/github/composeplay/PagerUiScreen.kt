@@ -37,11 +37,11 @@ val images = listOf(
     R.drawable.image_1,
     R.drawable.image_2,
     R.drawable.image_3,
-//    R.drawable.image_4,
-//    R.drawable.image_5,
-//    R.drawable.image_6,
-//    R.drawable.image_7,
-//    R.drawable.image_8,
+    R.drawable.image_4,
+    R.drawable.image_5,
+    R.drawable.image_6,
+    R.drawable.image_7,
+    R.drawable.image_8,
 //    R.drawable.image_9,
 //    R.drawable.image_10,
 //    R.drawable.image_11,
@@ -118,25 +118,25 @@ fun PageIndicatorContent(
         for (i in 0 until numberOfPages) {
             val isSelected = i == selectedPage
             val isSelecting = i == selectedPage - 1
-//            PageIndicatorView(
-//                isSelected = isSelected,
-//                selectedColor = selectedColor,
-//                defaultColor = defaultColor,
-//                defaultRadius = defaultRadius,
-//                selectedLength = selectedLength,
-//                animationDurationInMillis = animationDurationInMillis,
-//            )
-            Indicator(
-                selected = isSelected,
-                selecting = isSelecting,
-                index = selectedPage,
-                selectedColor = Color.Cyan,
-                defaultColor = Color.White,
-                lastColor = Color.Red,
-                spacing = 2.dp,
-                width = 8.dp,
-                height = 8.dp
+            PageIndicatorView(
+                isSelected = isSelected,
+                selectedColor = selectedColor,
+                defaultColor = defaultColor,
+                defaultRadius = defaultRadius,
+                selectedLength = selectedLength,
+                animationDurationInMillis = animationDurationInMillis,
             )
+//            Indicator(
+//                selected = isSelected,
+//                selecting = isSelecting,
+//                index = selectedPage,
+//                selectedColor = Color.Cyan,
+//                defaultColor = Color.White,
+//                lastColor = Color.Red,
+//                spacing = 2.dp,
+//                width = 8.dp,
+//                height = 8.dp
+//            )
         }
     }
 }
