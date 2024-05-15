@@ -31,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import images
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -41,16 +42,15 @@ import kotlin.math.absoluteValue
 @Composable
 fun CarouselApp(
     list: MutableList<Int>,
-    totalItemsToShow: Int = 10,
     carouselLabel: String = "",
     autoScrollDuration: Long = 1500L,
 ) {
 //    val pageCount = list.size
     val pageCount = Int.MAX_VALUE
     val pagerState: PagerState = rememberPagerState(initialPage = pageCount/2, pageCount = { pageCount })
-//    val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
+    val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
     var currentPageKey by remember { mutableIntStateOf(0) }
-//    if (isDragged.not()) {
+    if (isDragged.not()) {
         with(pagerState) {
             LaunchedEffect(key1 = currentPageKey) {
                 launch {
@@ -59,13 +59,13 @@ fun CarouselApp(
                     animateScrollToPage(
                         page = nextPage,
                         animationSpec = tween(
-                            durationMillis = 100
+                            durationMillis = 800
                         )
                     )
                     currentPageKey = nextPage
                 }
             }
-//        }
+        }
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -77,14 +77,14 @@ fun CarouselApp(
                 ),
                 pageSpacing = 10.dp
             ) { page: Int ->
-                val item = list[page]
-                currentPageKey = page
+                val item = list[page % list.size]
+//                currentPageKey = page
                 Card(
                     onClick = { },
-//                    modifier = Modifier.carouselTransition(
-//                        page,
-//                        pagerState
-//                    )
+                    modifier = Modifier.carouselTransition(
+                        page,
+                        pagerState
+                    )
                 ) {
                     CarouselBox(item)
                 }
