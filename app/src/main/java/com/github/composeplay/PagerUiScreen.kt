@@ -33,7 +33,6 @@ import com.github.composeplay.Indicator
 import com.github.composeplay.R
 
 val images = listOf(
-    R.drawable.image_0,
     R.drawable.image_1,
     R.drawable.image_2,
     R.drawable.image_3,
@@ -41,7 +40,6 @@ val images = listOf(
     R.drawable.image_5,
     R.drawable.image_6,
     R.drawable.image_7,
-    R.drawable.image_8,
 //    R.drawable.image_9,
 //    R.drawable.image_10,
 //    R.drawable.image_11,

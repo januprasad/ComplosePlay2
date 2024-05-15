@@ -273,8 +273,7 @@ private fun Carousal(modifier: Modifier, autoStart: Boolean, autoScrollDuration:
         ) { pageCount ->
             PagerUiScreen(
                 page = pageCount,
-                modifier = Modifier
-                    .aspectRatio(2.2f),
+                modifier = Modifier,
             ) {
                 scope.launch {
                     pagerState.animateScrollToPage(it)

@@ -43,30 +43,29 @@ fun CarouselApp(
     list: MutableList<Int>,
     totalItemsToShow: Int = 10,
     carouselLabel: String = "",
-    autoScrollDuration: Long = 2000L,
+    autoScrollDuration: Long = 1500L,
 ) {
-    val pageCount = list.size
-    val pagerState: PagerState = rememberPagerState(pageCount = { pageCount })
-    val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
-    if (isDragged.not()) {
+//    val pageCount = list.size
+    val pageCount = Int.MAX_VALUE
+    val pagerState: PagerState = rememberPagerState(initialPage = pageCount/2, pageCount = { pageCount })
+//    val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
+    var currentPageKey by remember { mutableIntStateOf(0) }
+//    if (isDragged.not()) {
         with(pagerState) {
-            if (pageCount > 0) {
-                var currentPageKey by remember { mutableIntStateOf(0) }
-                LaunchedEffect(key1 = currentPageKey) {
-                    launch {
-                        delay(timeMillis = autoScrollDuration)
-                        val nextPage = (currentPage + 1).mod(pageCount)
-                        animateScrollToPage(
-                            page = nextPage,
-                            animationSpec = tween(
-                                durationMillis = 100
-                            )
+            LaunchedEffect(key1 = currentPageKey) {
+                launch {
+                    delay(timeMillis = autoScrollDuration)
+                    val nextPage = (currentPage + 1).mod(pageCount)
+                    animateScrollToPage(
+                        page = nextPage,
+                        animationSpec = tween(
+                            durationMillis = 100
                         )
-                        currentPageKey = nextPage
-                    }
+                    )
+                    currentPageKey = nextPage
                 }
             }
-        }
+//        }
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -79,6 +78,7 @@ fun CarouselApp(
                 pageSpacing = 10.dp
             ) { page: Int ->
                 val item = list[page]
+                currentPageKey = page
                 Card(
                     onClick = { },
 //                    modifier = Modifier.carouselTransition(
@@ -106,10 +106,9 @@ fun CarouselBox(item: Int) {
         Image(
             painter = painterResource(id = item),
             contentDescription = null,
-            contentScale = ContentScale.FillBounds,
+            contentScale = ContentScale.Fit,
             modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(2.2f)
+                .fillMaxWidth().aspectRatio(2f)
         )
         val gradient = remember {
             Brush.verticalGradient(
