@@ -44,13 +44,14 @@ fun CarouselApp(
     list: MutableList<Int>,
     carouselLabel: String = "",
     autoScrollDuration: Long = 1500L,
+    autoScroll: Boolean = true
 ) {
 //    val pageCount = list.size
     val pageCount = Int.MAX_VALUE
     val pagerState: PagerState = rememberPagerState(initialPage = pageCount/2, pageCount = { pageCount })
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
     var currentPageKey by remember { mutableIntStateOf(0) }
-    if (isDragged.not()) {
+    if (isDragged.not() && autoScroll) {
         with(pagerState) {
             LaunchedEffect(key1 = currentPageKey) {
                 launch {

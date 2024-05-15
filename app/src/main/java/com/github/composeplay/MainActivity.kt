@@ -71,7 +71,8 @@ class MainActivity : ComponentActivity() {
                         ) {
 //                            MediaCarousal()
                             CarouselApp(
-                                list = images.toMutableList()
+                                list = images.toMutableList(),
+                                autoScroll = false
                             )
 //                            App()
 //                            SwapBox()
