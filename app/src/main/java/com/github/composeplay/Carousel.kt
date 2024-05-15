@@ -1,5 +1,6 @@
 package com.github.composeplay
 
+import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -18,7 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,51 +34,59 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
-@OptIn(
-    ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class
-)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Carousel(
     list: MutableList<Int>,
     autoScrollDuration: Long = 1500L,
     autoScroll: Boolean = true
 ) {
-//    val pageCount = list.size
     val pageCount = Int.MAX_VALUE
     val pagerState: PagerState = rememberPagerState(initialPage = pageCount/2, pageCount = { pageCount })
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
     var currentPageKey by remember { mutableIntStateOf(0) }
     if (isDragged.not() && autoScroll) {
         with(pagerState) {
-            LaunchedEffect(key1 = currentPageKey) {
+            LaunchedEffect(key1 = settledPage) {
                 launch {
                     delay(timeMillis = autoScrollDuration)
                     val nextPage = (currentPage + 1).mod(pageCount)
+                    currentPageKey = nextPage
+                    Log.v("LaunchedEffect", "$nextPage")
                     animateScrollToPage(
                         page = nextPage,
                         animationSpec = tween(
                             durationMillis = 800
                         )
                     )
-                    currentPageKey = nextPage
                 }
             }
         }
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        val scope = rememberCoroutineScope()
         Box {
             HorizontalPager(
                 state = pagerState,
                 contentPadding = PaddingValues(
                     horizontal = 32.dp
                 ),
-                pageSpacing = 20.dp
+                pageSpacing = 20.dp,
+                userScrollEnabled = false
             ) { page: Int ->
                 val item = list[page % list.size]
-//                currentPageKey = page
                 Card(
-                    onClick = { },
+                    onClick = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(
+                                page,
+                                animationSpec = tween(
+                                    durationMillis = 800,
+                                ),
+                            )
+                        }
+                    },
                     modifier = Modifier
                 ) {
                     PagerImages(item)
@@ -93,7 +104,8 @@ fun PagerImages(item: Int) {
             contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier = Modifier
-                .fillMaxWidth().aspectRatio(2f)
+                .fillMaxWidth()
+                .aspectRatio(2f)
         )
     }
 }
