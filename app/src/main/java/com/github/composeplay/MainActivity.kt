@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Color.Black),
+                                .background(Color.Black).padding(16.dp),
                         ) {
 //                            MediaCarousal()
                             Carousel(

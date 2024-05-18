@@ -38,7 +38,7 @@ import kotlin.math.absoluteValue
 @Composable
 fun Carousel(
     list: MutableList<Int>,
-    autoScrollDuration: Long = 1500L,
+    autoScrollDuration: Long = 2000L,
     autoScroll: Boolean = true
 ) {
     val pageCount = Int.MAX_VALUE
