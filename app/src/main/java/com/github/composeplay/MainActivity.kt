@@ -100,7 +100,11 @@ private fun Carousal2(
                     launch {
                         delay(timeMillis = autoScrollDuration)
                         val nextPage = (currentPage + 1).mod(pageCount)
-                        animateScrollToPage(nextPage)
+                        animateScrollToPage(
+                            nextPage, animationSpec = tween(
+                                durationMillis = 1200
+                            )
+                        )
                         currentPageKey = nextPage
                     }
                 }

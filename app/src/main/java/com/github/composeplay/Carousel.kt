@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -69,7 +71,7 @@ fun Carousel(
                     animateScrollToPage(
                         page = nextPage,
                         animationSpec = tween(
-                            durationMillis = 800
+                            durationMillis = 1800
                         )
                     )
                 }
@@ -135,21 +137,24 @@ fun SwapDotIndicators(
     count: Int,
     pagerState: PagerState,
 ) {
-    val times = 2
-    val circleSpacing = 4.dp.times(times)
-    val extraSpacing = 4.dp.times(4)
-    val circleSize = 8.dp.times(times)
+    val circleSpacing = 4.dp
+    val extraSpacing = 8.dp
+    val circleSize = 8.dp
 
     Box(
         modifier = modifier
-            .fillMaxWidth()
-            .height(48.dp), contentAlignment = Alignment.Center
+            .background(
+                Color.Black.copy(0.16f),
+                RoundedCornerShape(12.dp),
+            )
+            .padding(horizontal = 8.dp, vertical = 8.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        val width = (circleSize + extraSpacing) * count
+        val width = (circleSize +  extraSpacing) * count
 
         Canvas(
             modifier = Modifier
-                .width(width = width)
+                .width(width = width.times(0.9f))
         ) {
 
             val dotSize = circleSize.toPx()
@@ -214,9 +219,9 @@ private fun DrawScope.drawIndicator(
     color: Color,
 ) {
     val rect = RoundRect(
-        if(active) x - width.times(0.4f) else x,
+        if (active) x - width.times(0.2f) else x,
         y - height / 2,
-        x + width.times(if (active) 1.2f else 1f),
+        if (active) x + width.times(1.2f) else x + width,
         y + height / 2,
         radius
     )
