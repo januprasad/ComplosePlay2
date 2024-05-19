@@ -63,7 +63,7 @@ fun Carousel(
             LaunchedEffect(key1 = settledPage) {
                 launch {
                     delay(timeMillis = autoScrollDuration)
-                    val nextPage = (currentPage + 1).mod(pageCount)
+                    val nextPage = currentPage + 1
                     currentPageKey = nextPage
                     Log.v("LaunchedEffect", "$nextPage")
                     animateScrollToPage(
@@ -88,7 +88,7 @@ fun Carousel(
                 pageSpacing = 20.dp,
                 userScrollEnabled = false
             ) { page: Int ->
-                val item = list[page % list.size]
+                val item = list[page]
                 Card(
                     onClick = {
                         scope.launch {
@@ -107,7 +107,6 @@ fun Carousel(
             }
             SwapDotIndicators(
                 modifier = Modifier
-                    .padding(16.dp)
                     .align(Alignment.BottomCenter),
                 count = images.size,
                 pagerState = pagerState
@@ -146,21 +145,22 @@ fun SwapDotIndicators(
     count: Int,
     pagerState: PagerState,
 ) {
-    val circleSpacing = 8.dp
-    val circleSize = 20.dp
+    val times = 2
+    val circleSpacing = 4.dp.times(times)
+    val extraSpacing = 4.dp.times(4)
+    val circleSize = 8.dp.times(times)
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp), contentAlignment = Alignment.Center
     ) {
-        val width = (circleSize + circleSpacing) * count
+        val width = (circleSize + extraSpacing) * count
 
         Canvas(
             modifier = Modifier
                 .width(width = width)
         ) {
-            val distance = (circleSize + circleSpacing).toPx()
 
             val dotSize = circleSize.toPx()
 
@@ -171,7 +171,8 @@ fun SwapDotIndicators(
 
                 val dotOffset = posOffset - posOffset.toInt()
                 val current = posOffset.toInt()
-                val alpha = if (i == current) 1f else 0.4f
+                val alpha = if (i == current) 1f else 0.9f
+                val distance = (circleSize + extraSpacing).toPx()
 
                 val moveX: Float = when {
                     i == current -> posOffset
@@ -179,14 +180,14 @@ fun SwapDotIndicators(
                     else -> i.toFloat()
                 }
 
-//                drawIndicator(moveX * distance, yPos, dotSize, alpha)
                 drawIndicator(
                     x = moveX * distance,
                     y = yPos,
                     width = dotSize,
                     height = dotSize,
                     radius = CornerRadius(50f, 50f),
-                    active = false
+                    active = i == current,
+                    color = Color.White.copy(alpha)
                 )
             }
         }
@@ -220,14 +221,15 @@ private fun DrawScope.drawIndicator(
     height: Float,
     radius: CornerRadius,
     active: Boolean,
+    color: Color,
 ) {
     val rect = RoundRect(
-        x,
+        if(active) x - width.times(0.4f) else x,
         y - height / 2,
-        x + width,
+        x + width.times(if (active) 1.2f else 1f),
         y + height / 2,
         radius
     )
     val path = Path().apply { addRoundRect(rect) }
-    drawPath(path = path, color = Color.White)
+    drawPath(path = path, color = color)
 }
