@@ -29,7 +29,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.github.composeplay.Indicator
 import com.github.composeplay.R
 
 val images = listOf(
@@ -124,17 +123,6 @@ fun PageIndicatorContent(
                 selectedLength = selectedLength,
                 animationDurationInMillis = animationDurationInMillis,
             )
-//            Indicator(
-//                selected = isSelected,
-//                selecting = isSelecting,
-//                index = selectedPage,
-//                selectedColor = Color.Cyan,
-//                defaultColor = Color.White,
-//                lastColor = Color.Red,
-//                spacing = 2.dp,
-//                width = 8.dp,
-//                height = 8.dp
-//            )
         }
     }
 }

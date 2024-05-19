@@ -129,16 +129,6 @@ fun PagerImages(item: Int) {
     }
 }
 
-val PagerState.pageOffset: Float
-    get() = this.currentPage + this.currentPageOffsetFraction
-
-
-// To get scrolled offset from snap position
-fun PagerState.calculateCurrentOffsetForPage(page: Int): Float {
-    val nextPage = (currentPage + 1).mod(pageCount)
-    return (nextPage - page) + currentPageOffsetFraction
-}
-
 @Composable
 fun SwapDotIndicators(
     modifier: Modifier,

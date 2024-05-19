@@ -1,5 +1,6 @@
 package com.github.composeplay
 
+import PageIndicator
 import PagerUiScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,8 +13,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -50,15 +53,19 @@ class MainActivity : ComponentActivity() {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Color.Black).padding(16.dp),
+                                .background(Color.Black)
+                                .padding(16.dp),
                         ) {
 //                            MediaCarousal()
-                            Carousel(
-                                list = images.toMutableList(),
-                                autoScroll = true
-                            )
+//                            Carousel(
+//                                list = images.toMutableList(),
+//                                autoScroll = true
+//                            )
 //                            App()
 //                            SwapBox()
+                            Carousal2(
+
+                            )
                         }
                     }
                 }
@@ -69,7 +76,13 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-private fun Carousal(modifier: Modifier, autoStart: Boolean, autoScrollDuration: Long = 1000L) {
+private fun Carousal2(
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .aspectRatio(2.2f),
+    autoStart: Boolean = true,
+    autoScrollDuration: Long = 1800L
+) {
     Box(
         modifier,
         contentAlignment = Alignment.Center
@@ -82,7 +95,7 @@ private fun Carousal(modifier: Modifier, autoStart: Boolean, autoScrollDuration:
 
         if (autoStart) {
             var currentPageKey by remember { mutableIntStateOf(0) }
-            with(pagerState){
+            with(pagerState) {
                 LaunchedEffect(key1 = currentPageKey) {
                     launch {
                         delay(timeMillis = autoScrollDuration)
@@ -116,51 +129,14 @@ private fun Carousal(modifier: Modifier, autoStart: Boolean, autoScrollDuration:
 //                .align(Alignment.BottomCenter),
 //            pagerState = pagerState
 //        )
+        SwapDotIndicators(
+            modifier = Modifier
+                .padding(4.dp)
+                .align(Alignment.BottomCenter),
+            count = images.size, pagerState = pagerState
+        )
     }
 }
 
 
-@Composable
-fun Indicator(
-    selected: Boolean,
-    selecting: Boolean,
-    index: Int,
-    selectedColor: Color,
-    defaultColor: Color,
-    lastColor: Color,
-    spacing: Dp,
-    width: Dp,
-    height: Dp
-) {
-    val capsule: Dp by animateDpAsState(
-        targetValue = if (selected) {
-            width.times(2)
-        } else {
-            width
-        },
-        animationSpec = tween(
-            durationMillis = 100,
-        )
-    )
-
-    val bg: Color by animateColorAsState(
-        targetValue = if (selected) {
-            Color.Red
-        } else {
-            Color.White
-        },
-        animationSpec = tween(
-            durationMillis = 100,
-        )
-    )
-
-    Box(
-        modifier = Modifier
-            .padding(horizontal = spacing)
-            .size(width = capsule, height = height)
-            .background(
-                bg, CircleShape
-            )
-    )
-}
 
