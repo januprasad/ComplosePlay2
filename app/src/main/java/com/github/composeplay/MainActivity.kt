@@ -10,6 +10,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -35,10 +36,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.composeplay.ui.theme.ComposePlayTheme
-import images
+import imagesPool
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -55,6 +55,7 @@ class MainActivity : ComponentActivity() {
                                 .fillMaxSize()
                                 .background(Color.Black)
                                 .padding(16.dp),
+                            verticalArrangement = Arrangement.SpaceEvenly
                         ) {
 //                            MediaCarousal()
 //                            Carousel(
@@ -64,7 +65,10 @@ class MainActivity : ComponentActivity() {
 //                            App()
 //                            SwapBox()
                             Carousal2(
-
+                                images = imagesPool
+                            )
+                            Carousal2(
+                                images = imagesPool.take(4)
                             )
                         }
                     }
@@ -80,6 +84,7 @@ private fun Carousal2(
     modifier: Modifier = Modifier
         .fillMaxWidth()
         .aspectRatio(2.2f),
+    images: List<Int>,
     autoStart: Boolean = true,
     autoScrollDuration: Long = 1800L
 ) {

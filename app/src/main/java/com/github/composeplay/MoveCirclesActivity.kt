@@ -41,7 +41,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.github.composeplay.ui.theme.ComposePlayTheme
-import images
+import imagesPool
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -59,7 +59,7 @@ class MoveCirclesActivity : ComponentActivity() {
                                 .background(Color.White)
                                 .padding(20.dp),
                         ) {
-                            EndlessHP(items = images,
+                            EndlessHP(items = imagesPool,
                                 itemClicked = {
                                     Toast.makeText(
                                         this@MoveCirclesActivity,

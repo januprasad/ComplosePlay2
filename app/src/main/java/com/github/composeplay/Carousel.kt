@@ -32,18 +32,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import images
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -110,7 +108,7 @@ fun Carousel(
             SwapDotIndicators(
                 modifier = Modifier
                     .align(Alignment.BottomCenter),
-                count = images.size,
+                count = list.size,
                 pagerState = pagerState
             )
         }
@@ -150,11 +148,11 @@ fun SwapDotIndicators(
             .padding(horizontal = 8.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center,
     ) {
-        val width = (circleSize +  extraSpacing) * count
+        val canvasWidth = (circleSize) * (count.plus(count - 1))
 
         Canvas(
             modifier = Modifier
-                .width(width = width.times(0.9f))
+                .width(width = canvasWidth)
         ) {
 
             val dotSize = circleSize.toPx()
@@ -163,7 +161,6 @@ fun SwapDotIndicators(
 
             repeat(count) { i ->
                 val posOffset = pagerState.currentPage + pagerState.currentPageOffsetFraction
-
                 val dotOffset = posOffset - posOffset.toInt()
                 val current = posOffset.toInt()
                 val alpha = if (i == current) 1f else 0.9f
@@ -171,9 +168,15 @@ fun SwapDotIndicators(
 
                 val moveX: Float = when {
                     i == current -> posOffset
-                    i - 1 == current -> i - dotOffset
+                    i - 1 == current -> (i - dotOffset)
                     else -> i.toFloat()
                 }
+
+//                val distance: Float = when {
+//                    i == current -> (circleSize + extraSpacing).toPx()
+//                    i - 1 == current -> (circleSize + extraSpacing).toPx()
+//                    else -> (circleSize + extraSpacing).toPx()
+//                }
 
                 drawIndicator(
                     x = moveX * distance,
@@ -219,11 +222,11 @@ private fun DrawScope.drawIndicator(
     color: Color,
 ) {
     val rect = RoundRect(
-        if (active) x - width.times(0.2f) else x,
-        y - height / 2,
-        if (active) x + width.times(1.2f) else x + width,
-        y + height / 2,
-        radius
+        left = if (active) x - width.times(0.4f) else x,
+        top = y - height / 2,
+        right = if (active) x + width.times(1.4f) else (x + width.times(1)),
+        bottom = y + height / 2,
+        cornerRadius = radius
     )
     val path = Path().apply { addRoundRect(rect) }
     drawPath(path = path, color = color)

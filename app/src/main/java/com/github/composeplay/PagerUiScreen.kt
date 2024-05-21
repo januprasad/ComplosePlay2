@@ -31,14 +31,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.composeplay.R
 
-val images = listOf(
+val imagesPool = listOf(
     R.drawable.image_1,
     R.drawable.image_2,
     R.drawable.image_3,
     R.drawable.image_4,
-//    R.drawable.image_5,
-//    R.drawable.image_6,
-//    R.drawable.image_7,
+    R.drawable.image_5,
+    R.drawable.image_6,
+    R.drawable.image_7,
 //    R.drawable.image_9,
 //    R.drawable.image_10,
 //    R.drawable.image_11,
@@ -56,7 +56,7 @@ internal fun PagerUiScreen(
             .clip(RoundedCornerShape(12.dp))
     ) {
         Image(
-            painter = painterResource(id = images[page]),
+            painter = painterResource(id = imagesPool[page]),
             contentScale = ContentScale.Crop,
             contentDescription = null,
             modifier = Modifier
